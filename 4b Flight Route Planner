@@ -1,0 +1,152 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <climits>
+#include <functional>
+
+using namespace std;
+
+typedef pair<int, int> PII;
+// {travelTime, city}
+
+// Dijkstra's Algorithm
+void dijkstra(int source,
+              const vector<vector<PII>>& graph,
+              vector<int>& distance,
+              vector<int>& parent) {
+
+    int n = graph.size();
+
+    distance.assign(n, INT_MAX);
+    parent.assign(n, -1);
+
+    priority_queue<
+        PII,
+        vector<PII>,
+        greater<PII>
+    > pq;
+
+    distance[source] = 0;
+    pq.push({0, source});
+
+    while (!pq.empty()) {
+
+        int currentTime = pq.top().first;
+        int currentCity = pq.top().second;
+
+        pq.pop();
+
+        // Ignore outdated entry
+        if (currentTime > distance[currentCity])
+            continue;
+
+        // Check connected cities
+        for (auto edge : graph[currentCity]) {
+
+            int nextCity = edge.first;
+            int flightTime = edge.second;
+
+            if (distance[currentCity] + flightTime <
+                distance[nextCity]) {
+
+                distance[nextCity] =
+                    distance[currentCity] + flightTime;
+
+                parent[nextCity] = currentCity;
+
+                pq.push({
+                    distance[nextCity],
+                    nextCity
+                });
+            }
+        }
+    }
+}
+
+// Print shortest route
+void printPath(int city,
+               const vector<int>& parent) {
+
+    if (city == -1)
+        return;
+
+    printPath(parent[city], parent);
+
+    cout << city << " ";
+}
+
+int main() {
+
+    int n, m;
+
+    cout << "Enter number of airports/cities: ";
+    cin >> n;
+
+    cout << "Enter number of direct flights: ";
+    cin >> m;
+
+    vector<vector<PII>> graph(n);
+
+    cout << "\nEnter flight connections:\n";
+    cout << "Format: Source Destination TravelTime\n";
+
+    for (int i = 0; i < m; i++) {
+
+        int source, destination, time;
+
+        cin >> source >> destination >> time;
+
+        // Undirected connection
+        graph[source].push_back({
+            destination, time
+        });
+
+        graph[destination].push_back({
+            source, time
+        });
+    }
+
+    int source, destination;
+
+    cout << "\nEnter Source City (S): ";
+    cin >> source;
+
+    cout << "Enter Destination City (D): ";
+    cin >> destination;
+
+    vector<int> distance;
+    vector<int> parent;
+
+    // Apply Dijkstra
+    dijkstra(
+        source,
+        graph,
+        distance,
+        parent
+    );
+
+    cout << "\n===== Flight Route Result =====\n";
+
+    if (distance[destination] == INT_MAX) {
+
+        cout << "No route exists from "
+             << source
+             << " to "
+             << destination
+             << "." << endl;
+    }
+    else {
+
+        cout << "Shortest Travel Time: "
+             << distance[destination]
+             << " minutes" << endl;
+
+        cout << "Quickest Route: ";
+
+        printPath(destination, parent);
+
+        cout << endl;
+    }
+
+    return 0;
+}
