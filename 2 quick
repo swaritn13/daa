@@ -1,0 +1,129 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+struct Product {
+    int productId;
+    string productName;
+    double price;
+    double rating;
+    int salesVolume;
+};
+
+// Compare products based on selected parameter
+bool compare(Product a, Product b, int choice) {
+
+    if (choice == 1)
+        return a.price < b.price;
+
+    if (choice == 2)
+        return a.rating < b.rating;
+
+    if (choice == 3)
+        return a.salesVolume < b.salesVolume;
+
+    return false;
+}
+
+// Partition function
+int partition(vector<Product>& products,
+              int low, int high, int choice) {
+
+    Product pivot = products[high];
+
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+
+        if (compare(products[j], pivot, choice)) {
+            i++;
+            swap(products[i], products[j]);
+        }
+    }
+
+    swap(products[i + 1], products[high]);
+
+    return i + 1;
+}
+
+// Quick Sort
+void quickSort(vector<Product>& products,
+               int low, int high, int choice) {
+
+    if (low < high) {
+
+        int pi = partition(products, low, high, choice);
+
+        quickSort(products, low, pi - 1, choice);
+        quickSort(products, pi + 1, high, choice);
+    }
+}
+
+int main() {
+
+    int n;
+
+    cout << "Enter number of products: ";
+    cin >> n;
+
+    vector<Product> products(n);
+
+    // Input products
+    for (int i = 0; i < n; i++) {
+
+        cout << "\nProduct " << i + 1 << endl;
+
+        cout << "Enter Product ID: ";
+        cin >> products[i].productId;
+
+        cout << "Enter Product Name: ";
+        cin.ignore();
+        getline(cin, products[i].productName);
+
+        cout << "Enter Price: ";
+        cin >> products[i].price;
+
+        cout << "Enter Rating: ";
+        cin >> products[i].rating;
+
+        cout << "Enter Sales Volume: ";
+        cin >> products[i].salesVolume;
+    }
+
+    // User selects sorting parameter
+    int choice;
+
+    cout << "\nSort products by:\n";
+    cout << "1. Price\n";
+    cout << "2. Rating\n";
+    cout << "3. Sales Volume\n";
+    cout << "Enter choice: ";
+    cin >> choice;
+
+    // Apply Quick Sort
+    quickSort(products, 0, n - 1, choice);
+
+    // Display sorted products
+    cout << "\n===== Sorted Products =====\n";
+
+    for (const auto& product : products) {
+
+        cout << "ID: " << product.productId
+             << " | Name: " << product.productName
+             << " | Price: " << product.price
+             << " | Rating: " << product.rating
+             << " | Sales: " << product.salesVolume
+             << endl;
+    }
+
+    return 0;
+}
+
+struct Job { int jobId; string jobTitle; double salary; string postingDate; double companyRating; };
+
+struct Patient { int patientId; string patientName; int severity; string admissionDate; int age; };
+
+struct Student { int rollNo; string name; double cgpa; int totalMarks; int subjectMarks; }; 
+
+struct Travel { int travelId; string type; // Flight or Train string departureTime; double ticketPrice; int duration; // Duration in minutes };
