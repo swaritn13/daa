@@ -1,0 +1,112 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+struct Patient {
+    int id;
+    string name;
+    string admissionTime;
+};
+
+// Merge two sorted parts
+void merge(vector<Patient>& patients, int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    vector<Patient> L(n1);
+    vector<Patient> R(n2);
+
+    for (int i = 0; i < n1; i++)
+        L[i] = patients[left + i];
+
+    for (int j = 0; j < n2; j++)
+        R[j] = patients[mid + 1 + j];
+
+    int i = 0, j = 0, k = left;
+
+    while (i < n1 && j < n2) {
+        if (L[i].admissionTime <= R[j].admissionTime) {
+            patients[k] = L[i];
+            i++;
+        } else {
+            patients[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1) {
+        patients[k] = L[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        patients[k] = R[j];
+        j++;
+        k++;
+    }
+}
+
+// Merge Sort
+void mergeSort(vector<Patient>& patients, int left, int right) {
+    if (left >= right)
+        return;
+
+    int mid = left + (right - left) / 2;
+
+    mergeSort(patients, left, mid);
+    mergeSort(patients, mid + 1, right);
+
+    merge(patients, left, mid, right);
+}
+
+int main() {
+
+    int n;
+
+    cout << "Enter number of patients: ";
+    cin >> n;
+
+    vector<Patient> patients(n);
+
+    // Input patient records
+    for (int i = 0; i < n; i++) {
+
+        cout << "\nPatient " << i + 1 << endl;
+
+        cout << "Enter ID: ";
+        cin >> patients[i].id;
+
+        cout << "Enter Name: ";
+        cin >> patients[i].name;
+
+        cout << "Enter Admission Time (HH:MM): ";
+        cin >> patients[i].admissionTime;
+    }
+
+    // Apply Merge Sort
+    mergeSort(patients, 0, n - 1);
+
+    // Display sorted records
+    cout << "\n===== Patients Sorted by Admission Time =====\n";
+
+    for (const auto& patient : patients) {
+        cout << "ID: " << patient.id
+             << " | Name: " << patient.name
+             << " | Admission Time: " << patient.admissionTime
+             << endl;
+    }
+
+    return 0;
+}
+
+
+struct Transaction { int transactionId; string customerName; string purchaseTimestamp; double amount; };
+
+struct Book { int bookId; string bookName; string returnDeadline; };
+
+struct FlightBooking { int bookingId; string passengerName; string flightNumber; string departureTime; };
+
+struct Transaction { int transactionId; string accountHolder; double amount; };
