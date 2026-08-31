@@ -1,0 +1,125 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct Task {
+    int id;
+    double weight;       // Computing power required
+    double profit;       // Revenue
+    bool divisible;      // 1 = divisible, 0 = indivisible
+    double ratio;        // Profit / Computing power
+};
+
+// Compare tasks by profit-to-resource ratio
+bool compare(Task a, Task b) {
+    return a.ratio > b.ratio;
+}
+
+int main() {
+
+    int n;
+    double W;
+
+    cout << "Enter number of tasks: ";
+    cin >> n;
+
+    cout << "Enter total computing power W: ";
+    cin >> W;
+
+    vector<Task> tasks(n);
+
+    // Input tasks
+    for (int i = 0; i < n; i++) {
+
+        cout << "\nTask " << i + 1 << endl;
+
+        tasks[i].id = i + 1;
+
+        cout << "Enter computing requirement: ";
+        cin >> tasks[i].weight;
+
+        cout << "Enter revenue: ";
+        cin >> tasks[i].profit;
+
+        cout << "Is the task divisible? (1 = Yes, 0 = No): ";
+        cin >> tasks[i].divisible;
+
+        tasks[i].ratio = tasks[i].profit / tasks[i].weight;
+    }
+
+    // Sort by profit/resource ratio
+    sort(tasks.begin(), tasks.end(), compare);
+
+    double remaining = W;
+    double totalProfit = 0;
+
+    cout << "\n===== Task Allocation =====\n";
+
+    for (const auto& task : tasks) {
+
+        if (remaining <= 0)
+            break;
+
+        // If task is completely indivisible
+        if (!task.divisible) {
+
+            if (task.weight <= remaining) {
+
+                remaining -= task.weight;
+                totalProfit += task.profit;
+
+                cout << "Task " << task.id
+                     << " -> Fully allocated"
+                     << " | Resource: " << task.weight
+                     << " | Profit: " << task.profit
+                     << endl;
+            }
+        }
+
+        // If task is divisible
+        else {
+
+            if (task.weight <= remaining) {
+
+                remaining -= task.weight;
+                totalProfit += task.profit;
+
+                cout << "Task " << task.id
+                     << " -> Fully allocated"
+                     << " | Resource: " << task.weight
+                     << " | Profit: " << task.profit
+                     << endl;
+            }
+            else {
+
+                // Allocate only the remaining resource
+                double fraction = remaining / task.weight;
+                double profitEarned = task.profit * fraction;
+
+                cout << "Task " << task.id
+                     << " -> Partially allocated"
+                     << " | Resource: " << remaining
+                     << " | Fraction: " << fraction
+                     << " | Profit: " << profitEarned
+                     << endl;
+
+                totalProfit += profitEarned;
+                remaining = 0;
+            }
+        }
+    }
+
+    cout << "\n===== Result =====\n";
+    cout << "Total Computing Power Used: " << W - remaining << endl;
+    cout << "Remaining Computing Power: " << remaining << endl;
+    cout << "Maximum Revenue: " << totalProfit << endl;
+
+    return 0;
+}
+
+struct Cargo { int id; double weight; double profit; bool divisible; double ratio; };
+
+struct Advertisement { int id; double time; // Duration in minutes double revenue; bool divisible; double ratio; // Revenue / Time };
+
+struct Application { int id; double bandwidth; // Bandwidth required in Mbps double utility; bool divisible; double ratio; // Utility / Bandwidth };
