@@ -1,0 +1,148 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <climits>
+#include <functional>
+
+using namespace std;
+
+typedef pair<int, int> PII;
+// {travelTime, junction}
+
+// Dijkstra's Algorithm
+void dijkstra(int source,
+              const vector<vector<PII>>& graph,
+              vector<int>& distance,
+              vector<int>& parent) {
+
+    int n = graph.size();
+
+    distance.assign(n, INT_MAX);
+    parent.assign(n, -1);
+
+    // Min-priority queue
+    priority_queue<
+        PII,
+        vector<PII>,
+        greater<PII>
+    > pq;
+
+    distance[source] = 0;
+    pq.push({0, source});
+
+    while (!pq.empty()) {
+
+        int currentTime = pq.top().first;
+        int currentNode = pq.top().second;
+
+        pq.pop();
+
+        // Ignore outdated entry
+        if (currentTime > distance[currentNode])
+            continue;
+
+        // Check neighbouring junctions
+        for (auto edge : graph[currentNode]) {
+
+            int nextNode = edge.first;
+            int travelTime = edge.second;
+
+            if (distance[currentNode] + travelTime <
+                distance[nextNode]) {
+
+                distance[nextNode] =
+                    distance[currentNode] + travelTime;
+
+                parent[nextNode] = currentNode;
+
+                pq.push({
+                    distance[nextNode],
+                    nextNode
+                });
+            }
+        }
+    }
+}
+
+// Display shortest path
+void printPath(int node,
+               const vector<int>& parent) {
+
+    if (node == -1)
+        return;
+
+    printPath(parent[node], parent);
+
+    cout << node << " ";
+}
+
+int main() {
+
+    int n, m;
+
+    cout << "Enter number of junctions: ";
+    cin >> n;
+
+    cout << "Enter number of paths: ";
+    cin >> m;
+
+    vector<vector<PII>> graph(n);
+
+    cout << "\nEnter paths:\n";
+    cout << "Format: Junction1 Junction2 TravelTime\n";
+
+    for (int i = 0; i < m; i++) {
+
+        int u, v, time;
+
+        cin >> u >> v >> time;
+
+        // Factory paths are bidirectional
+        graph[u].push_back({v, time});
+        graph[v].push_back({u, time});
+    }
+
+    int source, destination;
+
+    cout << "\nEnter Source (Charging Station): ";
+    cin >> source;
+
+    cout << "Enter Destination (Assembly Point): ";
+    cin >> destination;
+
+    vector<int> distance;
+    vector<int> parent;
+
+    // Run Dijkstra
+    dijkstra(
+        source,
+        graph,
+        distance,
+        parent
+    );
+
+    cout << "\n===== Robot Navigation Result =====\n";
+
+    if (distance[destination] == INT_MAX) {
+
+        cout << "No path exists from "
+             << source
+             << " to "
+             << destination
+             << "." << endl;
+    }
+    else {
+
+        cout << "Shortest Travel Time: "
+             << distance[destination]
+             << " minutes" << endl;
+
+        cout << "Optimal Robot Path: ";
+
+        printPath(destination, parent);
+
+        cout << endl;
+    }
+
+    return 0;
+}
